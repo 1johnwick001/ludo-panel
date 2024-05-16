@@ -27,6 +27,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Button } from '@mui/material';
+import { toast } from 'react-toastify';
 
 
 const drawerWidth = 190;
@@ -128,9 +129,13 @@ export default function MiniDrawer() {
 
   //logout
   const AdminLogout = async () => {
+    const adminEmail = localStorage.getItem("Admin_Email")
+
     localStorage.removeItem("Admin_Email"); // Remove stored email
-    localStorage.removeItem("is_Admin_loggedIn"); // Clear session status
+    
+    toast.success(`Admin ${adminEmail} logged out successfully!`);
     navigate("/"); // Redirect to the home page or login page
+    localStorage.removeItem("is_Admin_loggedIn"); // Clear session status
   };
 
   const blueTheme = createTheme({

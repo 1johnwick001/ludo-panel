@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../components/Header';
 import API_BASE_URL from '../config/Config';
+import { toast } from 'react-toastify';
 
 interface Game {
   _id: number;
@@ -65,6 +66,7 @@ const EditGame = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
+      toast("✨Game data edited successfully✨")
       navigate('/GamesList');
     } catch (error) {
       console.error('Error updating game:', error);
@@ -116,11 +118,13 @@ const EditGame = () => {
                   </div>
                   <div className="mb-3">
                     <label htmlFor="gamePhoto" className="form-label">
-                      Game Photo
+                      Game Photo <br/>
+                    ~~ if you wont select a new image , prev img will be taken as a default img ~~
                     </label>
                     <input
                       type="file"
                       className="form-control"
+                     
                       id="gamePhoto"
                       name="gamePhoto"
                       accept="image/*"

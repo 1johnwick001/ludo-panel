@@ -10,6 +10,7 @@ import ClientList from '../Pages/ClientList';
 import TandC from '../Pages/Terms&condition';
 import AboutUs from '../Pages/AboutUs';
 import PrivacyPolicy from '../Pages/PrivacyPolicy';
+import EditClient from '../Pages/EditClient';
 
 
 function AllRoutes() {
@@ -23,6 +24,7 @@ function AllRoutes() {
             <Route path='/GamesList' element={ localStorage.getItem("is_Admin_loggedIn") ? <GamesList /> : <Navigate to ="/" />} />
             <Route path='/edit/:id' element={ localStorage.getItem("is_Admin_loggedIn") ? <EditGame /> : <Navigate to ="/" />} />
             <Route path='/clientList' element={ localStorage.getItem("is_Admin_loggedIn") ? <ClientList /> : <Navigate to ="/" />} />
+            <Route path='/editclientList/:id' element={ localStorage.getItem("is_Admin_loggedIn") ? <EditClient /> : <Navigate to ="/" />} />
             <Route path='/t&c' element={ <TandC/> } />
             <Route path='/AboutUs' element={ <AboutUs/> } />
             <Route path='/PrivacyPolicy' element={ <PrivacyPolicy/> } />

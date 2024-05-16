@@ -5,6 +5,7 @@ import axios from 'axios'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import API_BASE_URL from '../config/Config'
+import { toast } from 'react-toastify'
 
 
 function Login() {
@@ -24,20 +25,24 @@ function Login() {
                 email: userId,
                 password: password
             })
-            console.log("response of form: ", response.data);
             setUserId('');
             setPassword('');
+            console.log("response of form: ", response.data);
             localStorage.setItem("is_Admin_loggedIn", true.toString());
             localStorage.setItem("Admin_Email", userId);
 
             if (response?.data?.data.is_Admin_loggedIn === true) {
-                alert(`Admin ${userId} logged in successfully`)
+                toast.success(`Admin ${userId} logged in successfully`,{
+                    position: "top-center"});
                 navigate("/AdminHome")
             }
 
 
         } catch (error) {
-            console.log("error while submiing details", error);
+            console.log("error while submitting details", error);
+            // Display error toast for network or server errors
+            toast.error('Incorrect email or password. Please try again later.',{
+                position: "top-center"});
         } finally {
             setLoading(false) //Reset loading state after login attempt
         }

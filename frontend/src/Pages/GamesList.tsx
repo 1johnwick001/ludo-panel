@@ -3,6 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import API_BASE_URL from '../config/Config';
+import { toast } from 'react-toastify';
+import { Button } from '@mui/material';
+import DoneIcon from '@mui/icons-material/Done';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface Game {
     _id: number;
@@ -42,16 +46,45 @@ function GamesList() {
     const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
     const handleDelete = async (id: number) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this Entry?")
-        if (confirmDelete) {
-            try {
-                await axios.delete(`${API_BASE_URL}/api/admin/deletegame/${id}`)
-                //remove the deleted game from the state
-                setGames(games.filter(game => game._id !== id));
-            } catch (error) {
-                console.error("Error deleteing game:", error);
+        const customId = "custom-id-yes";
+
+        const confirmToastId = toast.info(
+            <div>
+                <p>Are you sure you want to delete this Entry?</p>
+                <Button 
+                style={{backgroundColor:'#4fc9d1',color:'black'}} 
+                variant="contained"
+                color="inherit"
+                onClick={() => handleDeleteConfirmed(id)}
+                startIcon={<DoneIcon/>}
+                >Yes</Button>
+                <Button
+                style={{left:'40px',backgroundColor:'#4fc9d1',color:'black'}} 
+                variant="contained"
+                color="inherit"
+                onClick={() => toast.dismiss(confirmToastId)}
+                startIcon={<CloseIcon/>}
+                >No</Button>
+            </div>,
+            {
+                toastId:customId,
+                position: 'top-center',
+                theme:"dark",
+                autoClose: false, // Disable auto-close
+                closeOnClick: true, // Disable close on click outside
             }
-        }
+        );
+        const handleDeleteConfirmed = async (id: number) => {
+            try {
+                await axios.delete(`${API_BASE_URL}/api/admin/deletegame/${id}`);
+                // Remove the deleted game from the state
+                setGames(games.filter(game => game._id !== id));
+                toast.success('Game deleted successfully');
+            } catch (error) {
+                console.error("Error deleting game:", error);
+                toast.error('Failed to delete game. Please try again.');
+            }
+        };
     }
 
     return (
@@ -60,8 +93,7 @@ function GamesList() {
             <div className='d-flex justify-content-center p-1' style={{ color: 'black', backgroundColor: '#4fc9d1' }}>
                 <h1>Games List</h1>
             </div>
-            <div className="container">
-
+            <div className="container" >
 
                 <br />
 

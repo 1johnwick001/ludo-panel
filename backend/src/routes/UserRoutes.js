@@ -1,5 +1,5 @@
 import express from "express"
-import { deleteUser, forgetPasswordOtp, getUserList, loginUser, logoutUser, otpVerify, passwordUpdate, registerUser } from "../controller/User.controller.js";
+import { deleteUser, forgetPasswordOtp, getUserList, getUserListById, loginUser, logoutUser, otpVerify, passwordUpdate, registerUser, updateUser } from "../controller/User.controller.js";
 import { betHistory, createBet } from "../controller/Bet.controller.js";
 
 
@@ -13,6 +13,10 @@ router.post("/api/user/register",registerUser)
 router.post("/api/user/login",loginUser)
 //api for getting list
 router.get("/api/user/profileList",getUserList)
+//api for user list by id
+router.get("/api/user/userListById/:id",getUserListById)
+//api for updating/edit user
+router.put("/api/user/updateUser/:id",updateUser)
 //sending otp on email
 router.post("/api/user/forgetpassotp",forgetPasswordOtp)
 //verification of otp

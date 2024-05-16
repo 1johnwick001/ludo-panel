@@ -8,7 +8,7 @@ function Header() {
     const navigate = useNavigate()
 
     const AdminLogout =  async() => {
-        localStorage.removeItem("Admin_Email"); // Remove stored email
+         localStorage.removeItem("Admin_Email"); // Remove stored email
         localStorage.removeItem("is_Admin_loggedIn"); // Clear session status
         navigate("/"); // Redirect to the home page or login page
     }

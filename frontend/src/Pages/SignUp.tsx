@@ -2,6 +2,7 @@ import axios from 'axios'
 import React, { useState } from 'react'
 import { Link,useNavigate } from 'react-router-dom'
 import API_BASE_URL from '../config/Config'
+import { toast } from 'react-toastify'
 
 function SignUp() {
 
@@ -14,6 +15,11 @@ function SignUp() {
     const handleSubmit = async(e:React.FormEvent) => {
         e.preventDefault()
 
+        if (!password || password.length < 8) {
+          toast.error('Password is required and must be at least 8 characters long.');
+          return; // Early return if validation fails
+        }
+
         await axios.post(`${API_BASE_URL}/api/admin/register`,{username,email,password})
         .then((response) => {
           console.log(response);
@@ -24,22 +30,22 @@ function SignUp() {
             setUserName('')
             setEmail('')
             setPasssword('')
-            alert("You have been sucessfully registered!!")
+            toast.success("You have been sucessfully registered!!",{ position: "top-center"})
             navigate('/AdminHome')
             
           }
           else if (response.status === 209) {
             // Handle USERNAME OR EMAIL ALREADY EXISTS error
-            alert('Username or email already exists');
+            toast.warn('Username or email already exists',{ position: "top-center"});
         } else {
             // Handle other errors
-            alert('An error occurred while registering. Please try again later.');
+            toast.error('An error occurred while registering. Please try again later.',{ position: "top-center"});
         }
         })
         .catch(error => {
           // Handle network errors or other exceptions
           console.error('Error:', error);
-          alert('An error occurred while registering. Please try again later.');
+          toast.error('An network error occurred while registering. Please try again later.',{ position: "top-center"});
       });
     }
 

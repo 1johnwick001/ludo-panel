@@ -344,7 +344,79 @@ const getUserList = async (req,res) => {
     }
 }
 
+const getUserListById = async(req,res) => {
+    try {
+        const id = req.params.id;
+        //Use Mongoose findById method to fetch the game by ID
+        const user = await User.findById(id);
+
+
+        if (!user) {
+            return res.status(404).json({
+                code:404,
+                status: false,
+                message: "No user found with the provided ID",
+                data: {}
+            })
+        }
+
+        //if game is found return it in the response
+        res.status(200).json({
+            code:200,
+            status:true,
+            message:"user data successfully fetched",
+            data:user
+        })
+
+    } catch (error) {
+        console.error("Error fetching user data by ID:", error);
+        res.status(500).json({
+            code: 500,
+            status: false,
+            message: "Error while getting user data by ID",
+            data: {}
+        })
+    }
+}
+
+const updateUser = async(req,res) => {
+    try {
+        const {id} = req.params
+        const {username, email, countryCode,phoneNumber} = req.body; 
+
+        const updatedUser = await User.findByIdAndUpdate(id, { username, email, countryCode, phoneNumber }, { new: true });
+        console.log(updatedUser);
+
+        if (!updatedUser) {
+            return res.status(400).json({
+                code:400,
+                status:false,
+                message:"user not found",
+                data:{}
+            })
+        }
+
+        return res.status(200).json({
+            code:200,
+            status:true,
+            message:"user updated successfully",
+            data:updatedUser
+        })
+
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ 
+            code:500,
+            status:false,
+            message: 'Server error',
+            data:{}
+        });
+    }
+}
 
 
 
-export {registerUser,loginUser,getUserList,logoutUser,deleteUser,forgetPasswordOtp,otpVerify,passwordUpdate}
+
+
+export {registerUser,loginUser,getUserList,logoutUser,deleteUser,forgetPasswordOtp,otpVerify,passwordUpdate,getUserListById,updateUser}

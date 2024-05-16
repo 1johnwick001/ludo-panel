@@ -3,6 +3,8 @@ import React, { ChangeEvent, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import API_BASE_URL from '../config/Config';
+import { toast } from 'react-toastify';
+
 
 function AddGames() {
   const [gameName, setGameName] = useState("");
@@ -43,6 +45,7 @@ function AddGames() {
       setGameType("")
 
       // Navigate to the game list page upon successful submission
+      toast(" 🤖 Game added successfully 🤖")
       navigate('/GamesList');
     } catch (error) {
       console.log('error while submiting data through API', error);

@@ -3,6 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import API_BASE_URL from '../config/Config';
+import { toast } from 'react-toastify';
+import { Button } from '@mui/material';
+import DoneIcon from '@mui/icons-material/Done';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface People {
     _id: number;
@@ -43,18 +47,49 @@ function ClientList() {
     const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
     const handleDelete = async (id:number) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this client?")
-        if (confirmDelete){
+        const customId = "custom-id-yes";
+
+        const confirmToastId = toast.info(
+            <div>
+                <p>Are you sure you want to delete this Entry?</p>
+                <Button 
+                style={{backgroundColor:'#4fc9d1',color:'black'}} 
+                variant="contained"
+                color="inherit"
+                onClick={() => handleDeleteConfirmed(id)}
+                startIcon={<DoneIcon/>}
+                >
+                    Yes
+                </Button>
+                <Button
+                style={{left:'40px',backgroundColor:'#4fc9d1',color:'black'}} 
+                variant="contained"
+                color="inherit"
+                onClick={() => toast.dismiss(confirmToastId)}
+                startIcon={<CloseIcon/>}
+                >
+                    No
+                </Button>
+        </div>,{
+            toastId:customId,
+            position: "top-center",
+            theme:"dark",
+            autoClose: false, // Disable auto-close
+            closeOnClick: true, // Disable close on click outside
+        }
+        )
+
+        const handleDeleteConfirmed = async (id: number) => {
             try {
-                
                 await axios.delete(`${API_BASE_URL}/api/user/deleteUser/${id}`)
-                
-                //remove the deleted game from the state
-                fetchClientList()
+                // Remove the deleted game from the state
+                setClients(clients.filter(client => client._id !== id));
+                toast.success('Game deleted successfully');
             } catch (error) {
-                console.error("Error deleteing game:",error);
+                console.error("Error deleting game:", error);
+                toast.error('Failed to delete game. Please try again.');
             }
-        }    
+        }; 
     }
 
     return (
@@ -87,9 +122,9 @@ function ClientList() {
                             <td>{user?.phoneNumber}</td>
                             
                             <td>
-                                {/* <Link to={`#`}className="btn btn-custom btn-md me-1 m-2" style={{color:'black', backgroundColor:'#4fc9d1'}}>
+                                <Link to={`/editclientList/${user?._id}`}className="btn btn-custom btn-md me-1 m-2" style={{color:'black', backgroundColor:'#4fc9d1'}}>
                                     Edit
-                                </Link> */}
+                                </Link>
                                 <button className="btn btn-danger btn-md"
                                 onClick={() => handleDelete(user?._id)}>
                                     Delete
