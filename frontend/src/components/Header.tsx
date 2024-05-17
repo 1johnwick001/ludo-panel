@@ -31,7 +31,7 @@ function Header() {
                         </Button>
                     
                    
-                        <Button
+                        {/* <Button
                             variant="contained"
                             color="inherit"
                             className='mx-3'
@@ -41,7 +41,7 @@ function Header() {
                             }}
                         >
                             Logout
-                        </Button>
+                        </Button> */}
                     </div>
                 </div>
             </div>

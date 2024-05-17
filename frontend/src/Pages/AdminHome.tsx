@@ -26,9 +26,10 @@ import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Button } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { toast } from 'react-toastify';
-
+import DoneIcon from '@mui/icons-material/Done';
+import CloseIcon from '@mui/icons-material/Close';
 
 const drawerWidth = 190;
 
@@ -102,22 +103,22 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 export default function MiniDrawer() {
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+  const [logoutDialogOpen, setLogoutDialogOpen] = React.useState(false);
 
   const handleTAndCClick = () => {
     navigate('/t&c'); 
   };
 
   const handleAboutUs = () => {
-    navigate('/AboutUs')
-  }
+    navigate('/AboutUs');
+  };
 
   const handlePrivacyPolicy = () => {
-    navigate('/PrivacyPolicy')
-  }
+    navigate('/PrivacyPolicy');
+  };
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -127,15 +128,22 @@ export default function MiniDrawer() {
     setOpen(false);
   };
 
-  //logout
-  const AdminLogout = async () => {
-    const adminEmail = localStorage.getItem("Admin_Email")
+  const handleLogoutDialogOpen = () => {
+    setLogoutDialogOpen(true);
+  };
 
+  const handleLogoutDialogClose = () => {
+    setLogoutDialogOpen(false);
+  };
+
+  const handleLogout = async () => {
+    const adminEmail = localStorage.getItem("Admin_Email");
+    toast.dismiss(); // Dismiss the confirmation toast
     localStorage.removeItem("Admin_Email"); // Remove stored email
-    
     toast.success(`Admin ${adminEmail} logged out successfully!`);
     navigate("/"); // Redirect to the home page or login page
     localStorage.removeItem("is_Admin_loggedIn"); // Clear session status
+    handleLogoutDialogClose(); // Close the confirmation dialog
   };
 
   const blueTheme = createTheme({
@@ -152,7 +160,6 @@ export default function MiniDrawer() {
         <CssBaseline />
         <AppBar position="fixed" open={open} style={{ padding: '5px' }} >
           <Toolbar>
-
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -161,9 +168,7 @@ export default function MiniDrawer() {
               sx={{
                 marginRight: 4,
                 ...(open && { display: 'none' }),
-
               }}
-
             >
               <MenuIcon />
             </IconButton>
@@ -174,15 +179,11 @@ export default function MiniDrawer() {
             <Button
               variant="contained"
               color="inherit"
-
               startIcon={<LogoutIcon />}
-              onClick={() => {
-                AdminLogout()
-              }}
+              onClick={handleLogoutDialogOpen}
             >
               Logout
             </Button>
-
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>
@@ -202,8 +203,8 @@ export default function MiniDrawer() {
                       : text === 'Add Games'
                         ? '/AddGames'
                         : text === 'GamesList'
-                          ? '/GamesList':'/GamesList'
-                          
+                          ? '/GamesList'
+                          : '/GamesList'
                   }
                   style={{ textDecoration: 'none', color: 'inherit' }}
                 >
@@ -212,7 +213,6 @@ export default function MiniDrawer() {
                       minHeight: 64,
                       justifyContent: open ? 'initial' : 'center',
                       px: 2.5,
-
                     }}
                   >
                     <ListItemIcon
@@ -220,7 +220,6 @@ export default function MiniDrawer() {
                         minWidth: 40,
                         mr: open ? 4 : 'auto',
                         justifyContent: 'center',
-
                       }}
                     >
                       {index % 4 === 0 ? (
@@ -230,10 +229,9 @@ export default function MiniDrawer() {
                       ) : index % 2 === 0 ? ( // Adjusted for Client List (index 2)
                         <SupervisorAccountIcon /> // Client List
                       ) : (
-                        <GavelIcon/> // T&C
+                        <GavelIcon /> // T&C
                       )}
                     </ListItemIcon>
-
                     <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
                   </ListItemButton>
                 </Link>
@@ -241,24 +239,10 @@ export default function MiniDrawer() {
             ))}
           </List>
           <Divider />
-
         </Drawer>
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
           <DrawerHeader />
           <Typography paragraph>
-            
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-            tempor incididunt ut labore et dolore magna aliqua. Rhoncus dolor purus non
-            enim praesent elementum facilisis leo vel. Risus at ultrices mi tempus
-            imperdiet. Semper risus in hendrerit gravida rutrum quisque non tellus.
-            Convallis convallis tellus id interdum velit laoreet id donec ultrices.
-            Odio morbi quis commodo odio aenean sed adipiscing. Amet nisl suscipit
-            adipiscing bibendum est ultricies integer quis. Cursus euismod quis viverra
-            nibh cras. Metus vulputate eu scelerisque felis imperdiet proin fermentum
-            leo. Mauris commodo quis imperdiet massa tincidunt. Cras tincidunt lobortis
-            feugiat vivamus at augue. At augue eget arcu dictum varius duis at
-            consectetur lorem. Velit sed ullamcorper morbi tincidunt. Lorem donec massa
-            sapien faucibus et molestie ac.
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
             tempor incididunt ut labore et dolore magna aliqua. Rhoncus dolor purus non
             enim praesent elementum facilisis leo vel. Risus at ultrices mi tempus
@@ -273,35 +257,56 @@ export default function MiniDrawer() {
             sapien faucibus et molestie ac.
           </Typography>
           <Button
-              variant="contained"
-              color="inherit"
-              onClick={handleTAndCClick}
-              startIcon={<GavelIcon/>}
-              >
-              Terms & Cond.
+            variant="contained"
+            color="inherit"
+            onClick={handleTAndCClick}
+            startIcon={<GavelIcon />}
+          >
+            Terms & Cond.
           </Button>
           <Button
-              style={{left:'10px'}}
-              variant="contained"
-              color="inherit"
-              onClick={handleAboutUs}
-              startIcon={<InfoIcon/>}
-              >
-             About Us
+            style={{ left: '10px' }}
+            variant="contained"
+            color="inherit"
+            onClick={handleAboutUs}
+            startIcon={<InfoIcon />}
+          >
+            About Us
           </Button>
           <Button
-              style={{left:'20px'}}
-              variant="contained"
-              color="inherit"
-              onClick={handlePrivacyPolicy}
-              startIcon={<PolicyIcon/>}
-              >
-             Privacy Policy
+            style={{ left: '20px' }}
+            variant="contained"
+            color="inherit"
+            onClick={handlePrivacyPolicy}
+            startIcon={<PolicyIcon />}
+          >
+            Privacy Policy
           </Button>
-
         </Box>
+
+        {/* Logout Confirmation Dialog */}
+        <Dialog
+          open={logoutDialogOpen}
+          onClose={handleLogoutDialogClose}
+          aria-labelledby="logout-dialog-title"
+          aria-describedby="logout-dialog-description"
+        >
+          <DialogTitle id="logout-dialog-title">{"Confirm Logout"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="logout-dialog-description">
+              Are you sure you want to log out?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleLogoutDialogClose} color="primary">
+              No
+            </Button>
+            <Button onClick={handleLogout} color="primary" autoFocus>
+              Yes
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </ThemeProvider>
-
   );
 }
