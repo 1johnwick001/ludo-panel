@@ -15,9 +15,7 @@ interface Game {
     gamePhoto: string;
 }
 
-
 function GamesList() {
-
     const [games, setGames] = useState<Game[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [gamesPerPage] = useState(5);
@@ -29,7 +27,6 @@ function GamesList() {
                 const res = await response.json();
                 setGames(res.data);
                 console.log(res.data);
-                
             } catch (error) {
                 console.error('Error fetching games:', error);
             }
@@ -45,47 +42,55 @@ function GamesList() {
     // Change page
     const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-    const handleDelete = async (id: number) => {
+    const handleDeleteConfirmed = async (id: number) => {
+        try {
+            await axios.delete(`${API_BASE_URL}/api/admin/deletegame/${id}`);
+            // Remove the deleted game from the state
+            setGames(prevGames => prevGames.filter(game => game._id !== id));
+            toast.success('Game deleted successfully');
+        } catch (error) {
+            console.error("Error deleting game:", error);
+            toast.error('Failed to delete game. Please try again.');
+        }
+    };
+
+    const handleDelete = (id: number) => {
         const customId = "custom-id-yes";
 
-        const confirmToastId = toast.info(
+        toast.info(
             <div>
                 <p>Are you sure you want to delete this Entry?</p>
-                <Button 
-                style={{backgroundColor:'#4fc9d1',color:'black'}} 
-                variant="contained"
-                color="inherit"
-                onClick={() => handleDeleteConfirmed(id)}
-                startIcon={<DoneIcon/>}
-                >Yes</Button>
                 <Button
-                style={{left:'40px',backgroundColor:'#4fc9d1',color:'black'}} 
-                variant="contained"
-                color="inherit"
-                onClick={() => toast.dismiss(confirmToastId)}
-                startIcon={<CloseIcon/>}
-                >No</Button>
+                    style={{ backgroundColor: '#4fc9d1', color: 'black' }}
+                    variant="contained"
+                    color="inherit"
+                    onClick={() => {
+                        handleDeleteConfirmed(id);
+                        toast.dismiss(customId);
+                    }}
+                    startIcon={<DoneIcon />}
+                >
+                    Yes
+                </Button>
+                <Button
+                    style={{ left: '40px', backgroundColor: '#4fc9d1', color: 'black' }}
+                    variant="contained"
+                    color="inherit"
+                    onClick={() => toast.dismiss(customId)}
+                    startIcon={<CloseIcon />}
+                >
+                    No
+                </Button>
             </div>,
             {
-                toastId:customId,
+                toastId: customId,
                 position: 'top-center',
-                theme:"dark",
+                theme: "dark",
                 autoClose: false, // Disable auto-close
                 closeOnClick: true, // Disable close on click outside
             }
         );
-        const handleDeleteConfirmed = async (id: number) => {
-            try {
-                await axios.delete(`${API_BASE_URL}/api/admin/deletegame/${id}`);
-                // Remove the deleted game from the state
-                setGames(games.filter(game => game._id !== id));
-                toast.success('Game deleted successfully');
-            } catch (error) {
-                console.error("Error deleting game:", error);
-                toast.error('Failed to delete game. Please try again.');
-            }
-        };
-    }
+    };
 
     return (
         <>
@@ -93,10 +98,8 @@ function GamesList() {
             <div className='d-flex justify-content-center p-1' style={{ color: 'black', backgroundColor: '#4fc9d1' }}>
                 <h1>Games List</h1>
             </div>
-            <div className="container" >
-
+            <div className="container">
                 <br />
-
                 <table className="table table-striped table-bordered">
                     <thead>
                         <tr>
@@ -114,7 +117,7 @@ function GamesList() {
                                 <td>{game.gameName}</td>
                                 <td>{game.gameType}</td>
                                 <td>
-                                    {game.gamePhoto?(
+                                    {game.gamePhoto ? (
                                         <img src={`${API_BASE_URL}/photos/${game.gamePhoto}`}
                                             alt={game.gameName}
                                             style={{ display: 'block', margin: 'auto', maxWidth: '100px', maxHeight: '90px', borderRadius: '55px' }}
