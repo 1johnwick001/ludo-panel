@@ -1,10 +1,9 @@
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import API_BASE_URL from '../config/Config';
-import { toast } from 'react-toastify';
-import { Button } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import DoneIcon from '@mui/icons-material/Done';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -19,20 +18,22 @@ function GamesList() {
     const [games, setGames] = useState<Game[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [gamesPerPage] = useState(5);
+    const [open, setOpen] = useState(false);
+    const [deleteId, setDeleteId] = useState<number | null>(null);
+
+    const fetchGames = useCallback(async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/admin/gameList`);
+            const res = await response.json();
+            setGames(res?.data.reverse());
+        } catch (error) {
+            console.error('Error fetching games:', error);
+        }
+    }, []);
 
     useEffect(() => {
-        const fetchGames = async () => {
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/admin/gameList`);
-                const res = await response.json();
-                setGames(res.data);
-                console.log(res.data);
-            } catch (error) {
-                console.error('Error fetching games:', error);
-            }
-        };
         fetchGames();
-    }, []);
+    }, [fetchGames]);
 
     // Get current games
     const indexOfLastGame = currentPage * gamesPerPage;
@@ -42,54 +43,27 @@ function GamesList() {
     // Change page
     const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-    const handleDeleteConfirmed = async (id: number) => {
-        try {
-            await axios.delete(`${API_BASE_URL}/api/admin/deletegame/${id}`);
-            // Remove the deleted game from the state
-            setGames(prevGames => prevGames.filter(game => game._id !== id));
-            toast.success('Game deleted successfully');
-        } catch (error) {
-            console.error("Error deleting game:", error);
-            toast.error('Failed to delete game. Please try again.');
+    const handleDeleteConfirmed = async () => {
+        if (deleteId !== null) {
+            try {
+                await axios.delete(`${API_BASE_URL}/api/admin/deletegame/${deleteId}`);
+                setDeleteId(null);
+                setOpen(false);
+                fetchGames();
+            } catch (error) {
+                console.error("Error deleting game:", error);
+            }
         }
     };
 
     const handleDelete = (id: number) => {
-        const customId = "custom-id-yes";
+        setDeleteId(id);
+        setOpen(true);
+    };
 
-        toast.info(
-            <div>
-                <p>Are you sure you want to delete this Entry?</p>
-                <Button
-                    style={{ backgroundColor: '#4fc9d1', color: 'black' }}
-                    variant="contained"
-                    color="inherit"
-                    onClick={() => {
-                        handleDeleteConfirmed(id);
-                        toast.dismiss(customId);
-                    }}
-                    startIcon={<DoneIcon />}
-                >
-                    Yes
-                </Button>
-                <Button
-                    style={{ left: '40px', backgroundColor: '#4fc9d1', color: 'black' }}
-                    variant="contained"
-                    color="inherit"
-                    onClick={() => toast.dismiss(customId)}
-                    startIcon={<CloseIcon />}
-                >
-                    No
-                </Button>
-            </div>,
-            {
-                toastId: customId,
-                position: 'top-center',
-                theme: "dark",
-                autoClose: false, // Disable auto-close
-                closeOnClick: true, // Disable close on click outside
-            }
-        );
+    const handleClose = () => {
+        setOpen(false);
+        setDeleteId(null);
     };
 
     return (
@@ -149,6 +123,23 @@ function GamesList() {
                     ))}
                 </ul>
             </div>
+
+            <Dialog open={open} onClose={handleClose}>
+                <DialogTitle>{"Confirm Deletion"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete this game?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose} style={{ backgroundColor: '#4fc9d1', color: 'black' }} startIcon={<CloseIcon />}>
+                        No
+                    </Button>
+                    <Button onClick={handleDeleteConfirmed} style={{ backgroundColor: '#4fc9d1', color: 'black' }} startIcon={<DoneIcon />}>
+                        Yes
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 }

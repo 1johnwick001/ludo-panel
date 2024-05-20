@@ -43,9 +43,9 @@ function AddGames() {
       setGameName("")
       setGamePhoto(null)
       setGameType("")
+      toast(" 🤖 Game added successfully 🤖")
 
       // Navigate to the game list page upon successful submission
-      toast(" 🤖 Game added successfully 🤖")
       navigate('/GamesList');
     } catch (error) {
       console.log('error while submiting data through API', error);
